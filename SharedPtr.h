@@ -4,48 +4,71 @@
 #include <memory>
 #include <iostream>
 
-template <typename T>
-class SharedPtr
+namespace MemoryManagement
 {
-    int* referenceCounter = nullptr;
-    T* data;
+    constexpr bool verbose = true;
 
-    public:
-    SharedPtr(size_t dataSize)
+    template <typename T>
+    class SharedPtr
     {
-        std::cout<<"in SharedPtr constructor"<<'\n';
-        referenceCounter = new int;
-        *referenceCounter = 1;
-        std::cout<<"reference counter="<<std::to_string(*referenceCounter)<<'\n';
-        data = new T[dataSize];
-    }
+        int* referenceCounter = nullptr;
+        T* data;
 
-    SharedPtr(SharedPtr& other)
-    {
-        std::cout<<"in SharedPtr copy constructor"<<'\n';
-        referenceCounter = other.referenceCounter;
-        
-        std::cout<<"new ref counter = "
-            <<referenceCounter
-            <<" old ref counter = "
-            << other.referenceCounter
-            << '\n';
-        (*referenceCounter)++;
-        std::cout<<"reference counter="<<std::to_string(*referenceCounter)<<'\n';
-    }
-
-    ~SharedPtr()
-    {
-        std::cout<<"in SharedPtr destructor"<<'\n';
-
-        (*referenceCounter)--;
-        std::cout<<"reference counter="<<std::to_string(*referenceCounter)<<'\n';
-        if (*referenceCounter == 0)
+        public:
+        SharedPtr(size_t dataSize)
         {
-            delete referenceCounter;
-            delete[] data;
-        }
-    }
-};
+            if constexpr (verbose) std::cout<<"in SharedPtr constructor"<<'\n';
 
+            referenceCounter = new int;
+            *referenceCounter = 1;
+
+            if constexpr (verbose)
+            {
+                std::cout<<"reference counter="<<std::to_string(*referenceCounter)<<'\n';
+            }
+            
+            data = new T[dataSize];
+        }
+
+        SharedPtr(SharedPtr& other)
+        {
+            if constexpr (verbose) std::cout<<"in SharedPtr copy constructor"<<'\n';
+            referenceCounter = other.referenceCounter;
+            
+            if constexpr (verbose)
+            {
+            std::cout<<"new ref counter = "
+                <<referenceCounter
+                <<" old ref counter = "
+                << other.referenceCounter
+                << '\n';
+            }
+
+            (*referenceCounter)++;
+
+            if constexpr (verbose)
+            {
+                std::cout<<"reference counter="<<std::to_string(*referenceCounter)<<'\n';
+            }
+        }
+
+        ~SharedPtr()
+        {
+            if constexpr (verbose) std::cout<<"in SharedPtr destructor"<<'\n';
+
+            (*referenceCounter)--;
+
+            if constexpr (verbose)
+            {
+                std::cout<<"reference counter="<<std::to_string(*referenceCounter)<<'\n';
+            }
+
+            if (*referenceCounter == 0)
+            {
+                delete referenceCounter;
+                delete[] data;
+            }
+        }
+    };
+}
 #endif
